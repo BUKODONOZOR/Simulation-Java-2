@@ -1,2 +1,9 @@
-package com.Main.Simulation.config;public class AuditConfig {
+package com.Main.Simulation.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+@Configuration
+@EnableJpaAuditing
+public class AuditConfig {
 }
