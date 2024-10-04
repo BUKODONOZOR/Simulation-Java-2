@@ -23,7 +23,6 @@ public class ProjectController {
 
         // Convert to DTO to return the response
         ProjectDTO responseProjectDTO = new ProjectDTO();
-        responseProjectDTO.setId(createdProject.getId());
         responseProjectDTO.setName(createdProject.getName());
         responseProjectDTO.setDescription(createdProject.getDescription());
         // Populate tasks if necessary (add logic if needed)
@@ -38,7 +37,6 @@ public class ProjectController {
         // Map entities to DTOs
         List<ProjectDTO> projectDTOs = projects.stream().map(project -> {
             ProjectDTO dto = new ProjectDTO();
-            dto.setId(project.getId());
             dto.setName(project.getName());
             dto.setDescription(project.getDescription());
             return dto;
@@ -56,7 +54,6 @@ public class ProjectController {
         }
 
         ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setId(project.getId());
         projectDTO.setName(project.getName());
         projectDTO.setDescription(project.getDescription());
 

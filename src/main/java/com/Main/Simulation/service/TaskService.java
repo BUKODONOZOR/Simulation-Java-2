@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
@@ -29,16 +30,21 @@ public class TaskService {
         Task task = new Task();
         task.setTitle(taskDTO.getTitle());
         task.setDescription(taskDTO.getDescription());
-        task.setDueDate(LocalDateTime.parse(taskDTO.getDueDate()));
 
-        // Set Project reference
+        // Manejo de la fecha de vencimiento
+        try {
+            task.setDueDate(taskDTO.getDueDate());
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Formato de fecha no válido: " + taskDTO.getDueDate(), e);
+        }
+
+        // Establecer referencia al proyecto
         Project project = new Project();
-        project.setId(taskDTO.getProjectId()); // Assume project exists
         task.setProject(project);
 
-        // Set Assigned User reference
+        // Establecer referencia al usuario asignado
         User user = userRepository.findById(taskDTO.getAssignedUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         task.setAssignedUser(user);
 
         return taskRepository.save(task);

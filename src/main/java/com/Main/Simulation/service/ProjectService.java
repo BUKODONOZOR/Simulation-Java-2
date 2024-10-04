@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
@@ -36,7 +38,12 @@ public class ProjectService {
                 Task task = new Task();
                 task.setTitle(taskDTO.getTitle());
                 task.setDescription(taskDTO.getDescription());
-                task.setDueDate(LocalDateTime.parse(taskDTO.getDueDate())); // Parse date
+                task.setDueDate(taskDTO.getDueDate());
+
+                if (taskDTO.getDueDate() == null) {
+                    throw new IllegalArgumentException("La fecha de vencimiento no puede ser nula");
+                }
+
                 task.setProject(savedProject);
                 taskRepository.save(task);
             }
@@ -44,6 +51,7 @@ public class ProjectService {
 
         return savedProject;
     }
+
 
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
