@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] publics = {"/api/projects", "/api/projects/{id}"};
+    private final String[] publics = {"/api/projects", "/api/projects/{id}", "/api/tasks", "/api/tasks/user/{userId}", "/api/users", "/api/users/register", "/api/users/login"};
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
