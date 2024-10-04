@@ -1,17 +1,18 @@
 package com.Main.Simulation.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 
 
 @Entity
+@Data
 public class Task extends Audit {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @NotNull
     private String title;
 
     private String description;
@@ -26,52 +27,4 @@ public class Task extends Audit {
     @JoinColumn(name = "assigned_user_id")
     private User assignedUser;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getAssignedUser() {
-        return assignedUser;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public LocalDateTime getDueDate() {
-        return dueDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public void setAssignedUser(User assignedUser) {
-        this.assignedUser = assignedUser;
-    }
-
-    public void setDueDate(LocalDateTime dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 }
