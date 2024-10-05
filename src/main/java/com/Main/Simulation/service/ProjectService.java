@@ -1,76 +1,65 @@
 package com.Main.Simulation.service;
 
-import com.Main.Simulation.dto.ProjectDTO;
-import com.Main.Simulation.dto.TaskDTO;
+import com.Main.Simulation.dto.create.ExtendedTaskDTO;
+import com.Main.Simulation.dto.create.ProjectCreateDTO;
+import com.Main.Simulation.dto.response.BasicTaskDTO;
 import com.Main.Simulation.entity.Project;
 import com.Main.Simulation.entity.Task;
-import com.Main.Simulation.entity.User;
 import com.Main.Simulation.repository.ProjectRepository;
-import com.Main.Simulation.repository.TaskRepository;
-import com.Main.Simulation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProjectService {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
-    private TaskRepository taskRepository;
+    private TaskService taskService;
 
     @Transactional
-    public Project createProjectWithTasks(ProjectDTO projectDTO) {
+    public Project createProjectWithTasks(ProjectCreateDTO projectDTO) {
         Project project = new Project();
         project.setName(projectDTO.getName());
         project.setDescription(projectDTO.getDescription());
 
         Project savedProject = projectRepository.save(project);
 
-        // Handle tasks if they exist
-        if (projectDTO.getTasks() != null) {
-            for (TaskDTO taskDTO : projectDTO.getTasks()) {
-                Task task = new Task();
-                task.setTitle(taskDTO.getTitle());
-                task.setDescription(taskDTO.getDescription());
-                task.setDueDate(taskDTO.getDueDate());
-
-                if (taskDTO.getDueDate() == null) {
-                    throw new IllegalArgumentException("La fecha de vencimiento no puede ser nula");
-                }
-                if (taskDTO.getAssignedUserId() != null) {
-                    Optional<User> userOptional = userRepository.findById(taskDTO.getAssignedUserId());
-                    if (userOptional.isPresent()) {
-                        task.setAssignedUser(userOptional.get());
-                    } else {
-                        throw new IllegalArgumentException("El usuario con ID " + taskDTO.getAssignedUserId() + " no existe");
-                    }
-                }
-                task.setProject(savedProject);
-                taskRepository.save(task);
+        if (projectDTO.getTasks() != null && !projectDTO.getTasks().isEmpty()) {
+            for (ExtendedTaskDTO extendedTaskDTO : projectDTO.getTasks()) {
+                taskService.createTaskFromExtendedDTO(extendedTaskDTO, savedProject.getId());
             }
         }
 
         return savedProject;
     }
 
-
+    /**
+     * Obtener todos los proyectos.
+     */
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
     }
 
+    /**
+     * Obtener un proyecto por su ID.
+     */
     public Project getProjectById(Long id) {
         return projectRepository.findById(id).orElse(null);
+    }
+
+    /**
+     * Obtener las tareas de un proyecto específico en formato DTO.
+     */
+    public List<BasicTaskDTO> getTasksForProject(Long projectId) {
+        Project project = getProjectById(projectId);
+        if (project != null && project.getTasks() != null) {
+            return taskService.convertTasksToBasicDTOs(project.getTasks());
+        }
+        return List.of();  // Retorna una lista vacía si no hay tareas o el proyecto no existe
     }
 }

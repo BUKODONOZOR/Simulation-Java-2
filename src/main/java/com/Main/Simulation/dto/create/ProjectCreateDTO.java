@@ -1,16 +1,13 @@
-package com.Main.Simulation.dto;
+package com.Main.Simulation.dto.create;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 
-@Setter
 @Getter
-@Data
-public class ProjectDTO {
+@Setter
+public class ProjectCreateDTO {
     private String name;
     private String description;
-    private List<TaskDTO> tasks;
+    private List<ExtendedTaskDTO> tasks;
 }

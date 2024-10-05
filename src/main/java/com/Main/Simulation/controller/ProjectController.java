@@ -1,6 +1,7 @@
 package com.Main.Simulation.controller;
 
-import com.Main.Simulation.dto.ProjectDTO;
+import com.Main.Simulation.dto.create.ProjectCreateDTO;
+import com.Main.Simulation.dto.response.BasicTaskDTO;
 import com.Main.Simulation.entity.Project;
 import com.Main.Simulation.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,47 +17,27 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    // Endpoint to create a project along with its tasks
     @PostMapping
-    public ResponseEntity<ProjectDTO> createProjectWithTasks(@RequestBody ProjectDTO projectDTO) {
-        Project createdProject = projectService.createProjectWithTasks(projectDTO);
-
-        // Convert to DTO to return the response
-        ProjectDTO responseProjectDTO = new ProjectDTO();
-        responseProjectDTO.setName(createdProject.getName());
-        responseProjectDTO.setDescription(createdProject.getDescription());
-        // Populate tasks if necessary (add logic if needed)
-
-        return ResponseEntity.ok(responseProjectDTO);
+    public ResponseEntity<Project> createProject(@RequestBody ProjectCreateDTO projectCreateDTO) {
+        Project createdProject = projectService.createProjectWithTasks(projectCreateDTO);
+        return ResponseEntity.ok(createdProject);
     }
 
-    // Endpoint to get all projects
     @GetMapping
-    public ResponseEntity<List<ProjectDTO>> getAllProjects() {
+    public ResponseEntity<List<Project>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
-        // Map entities to DTOs
-        List<ProjectDTO> projectDTOs = projects.stream().map(project -> {
-            ProjectDTO dto = new ProjectDTO();
-            dto.setName(project.getName());
-            dto.setDescription(project.getDescription());
-            return dto;
-        }).toList();
-
-        return ResponseEntity.ok(projectDTOs);
+        return ResponseEntity.ok(projects);
     }
 
-    // Endpoint to get a project by id
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDTO> getProjectById(@PathVariable Long id) {
+    public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
         Project project = projectService.getProjectById(id);
-        if (project == null) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(project);
+    }
 
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setName(project.getName());
-        projectDTO.setDescription(project.getDescription());
-
-        return ResponseEntity.ok(projectDTO);
+    @GetMapping("/{id}/tasks")
+    public ResponseEntity<List<BasicTaskDTO>> getTasksForProject(@PathVariable Long id) {
+        List<BasicTaskDTO> tasks = projectService.getTasksForProject(id);
+        return ResponseEntity.ok(tasks);
     }
 }

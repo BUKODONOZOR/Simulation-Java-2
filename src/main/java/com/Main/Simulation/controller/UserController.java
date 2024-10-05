@@ -1,7 +1,7 @@
 package com.Main.Simulation.controller;
 
-
-import com.Main.Simulation.dto.UserDTO;
+import com.Main.Simulation.dto.response.UserResponseDTO;
+import com.Main.Simulation.dto.create.UserCreateDTO;
 import com.Main.Simulation.entity.User;
 import com.Main.Simulation.service.UserService;
 import com.Main.Simulation.utils.Role;
@@ -11,22 +11,23 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
-
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    // Endpoint to register a new user
+    // Endpoint para registrar un nuevo usuario
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserCreateDTO userCreateDTO) {
         User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword());
-        user.setRole(Role.USER); // By default, users are regular
+        user.setUsername(userCreateDTO.getUsername());
+        user.setPassword(userCreateDTO.getPassword());
+        user.setRole(Role.USER); // Por defecto, rol de usuario normal
 
         User createdUser = userService.createUser(user);
-        UserDTO responseUserDTO = new UserDTO();
+
+        // Crear el DTO de respuesta
+        UserResponseDTO responseUserDTO = new UserResponseDTO();
         responseUserDTO.setId(createdUser.getId());
         responseUserDTO.setUsername(createdUser.getUsername());
         responseUserDTO.setRole(createdUser.getRole().name());
@@ -34,17 +35,16 @@ public class UserController {
         return ResponseEntity.ok(responseUserDTO);
     }
 
-    // Endpoint for user login
+    // Endpoint para el login del usuario
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO) {
-        User user = userService.getUserByUsername(userDTO.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public ResponseEntity<String> loginUser(@RequestBody UserCreateDTO userCreateDTO) {
+        User user = userService.getUserByUsername(userCreateDTO.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (user.getPassword().equals(userDTO.getPassword())) { // Aquí está el uso del getter
-            return ResponseEntity.ok("Login successful");
+        if (user.getPassword().equals(userCreateDTO.getPassword())) {
+            return ResponseEntity.ok("Login Succes");
         } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            return ResponseEntity.status(401).body("Credenciales inválidas");
         }
     }
-
 }
